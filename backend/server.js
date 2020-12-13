@@ -2,7 +2,7 @@ const Koa = require('koa');
 const Router = require('@koa/router');
 const cors = require('@koa/cors');
 const ethers = require('ethers');
-const PaymentProcessor = require('../build/contracts/PaymentProcessor.json');
+const PaymentProcessor = require('../frontend/src/contracts/PaymentProcessor.json');
 const { Payment } = require('./db.js');
 
 const app = new Koa();
@@ -32,7 +32,7 @@ router.get('/api/getPaymentId/:itemId', async (ctx, next) => {
 // get the url to download an item purchased
 router.get('/api/getItemUrl/:paymentId', async (ctx, next) => {
   // 1. verify paymentId exist in db and has been paid
-  const payment = await Payment.findOne({ id: tx.params.paymentId });
+  const payment = await Payment.findOne({ id: ctx.params.paymentId });
   // 2. return url to download item
   if (payment && payment.paid === true) {
     ctx.body = {
@@ -72,10 +72,10 @@ const listenToEvents = () => {
       from ${payer}
       amount ${amount.toString()}
       paymentId ${paymentId}
-      date ${new Date(data.toNumber() * 1000).toLocaleString()}
+      date ${new Date(date.toNumber() * 1000).toLocaleString()}
     `);
 
-    const payment = await Payment.findOne({ id: paymentId.toSting() });
+    const payment = await Payment.findOne({ id: paymentId.toString() });
 
     if (payment) {
       payment.paid = true;
